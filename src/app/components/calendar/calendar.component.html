@@ -1,7 +1,9 @@
 <div class="calendar-container">
   <header>
     <button mat-flat-button (click)="goToPreviousMonth()">Prev</button>
-    <h2>
+
+    <!-- Clickable h2 to open date picker -->
+    <h2 (click)="openDatePicker()" style="cursor: pointer;">
       {{
         currentMonth.toLocaleString("default", {
           month: "long",
@@ -9,24 +11,25 @@
         })
       }}
     </h2>
+
     <button mat-flat-button (click)="goToNextMonth()">Next</button>
   </header>
 
+  <!-- Hidden input for datepicker -->
+  <mat-form-field appearance="outline" style="display: none;">
+    <input matInput [matDatepicker]="picker" (dateChange)="onMonthSelected($event.value)">
+    <mat-datepicker #picker startView="multi-year" (monthSelected)="onMonthSelected($event)"></mat-datepicker>
+  </mat-form-field>
+
   <div class="calendar" cdkDropListGroup>
     <div class="days-of-week">
-      <div
-        *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
-      >
+      <div *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']">
         {{ day }}
       </div>
     </div>
     <div class="days">
       <div *ngFor="let day of emptyDays" class="day"></div>
-      <app-event-day
-        class="day"
-        *ngFor="let day of daysInMonth"
-        [day]="day"
-      ></app-event-day>
+      <app-event-day class="day" *ngFor="let day of daysInMonth" [day]="day"></app-event-day>
     </div>
   </div>
 </div>
