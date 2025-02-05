@@ -6,10 +6,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { EventsService } from '../../service/events/events.service';
 import { EventDayComponent } from '../event-day/event-day.component';
 import { CdkDropListGroup, DragDropModule } from '@angular/cdk/drag-drop';
-import { MatDatepicker, MatDatepickerModule } from '@angular/material/datepicker';
+import {
+  MatDatepicker,
+  MatDatepickerModule,
+} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-calendar',
@@ -33,37 +37,73 @@ import { MatInputModule } from '@angular/material/input';
 export class CalendarComponent implements OnInit {
   currentMonth: Date = new Date();
   daysInMonth: Date[] = [];
-  emptyDays: any[] = [];
-  
+  emptyDays: null[] = [];
+
   @ViewChild('picker') picker!: MatDatepicker<Date>; // Reference to DatePicker
 
-  constructor(private eventsService: EventsService) {}
+  constructor(
+    private eventsService: EventsService,
+    private route: ActivatedRoute,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
+    this.route.queryParams.subscribe((params) => {
+      if (params['m']) {
+        const [year, month] = params['m'].split('-');
+        this.eventsService.setCurrentMonth(new Date(+year, +month - 1, 1));
+      } else {
+        this.eventsService.setCurrentMonth(new Date());
+      }
+    });
+
+    this.eventsService.currentMonth$.subscribe((date) => {
+      this.currentMonth = date;
+    });
+
+    this.eventsService.daysInMonth$.subscribe((days) => {
+      this.daysInMonth = days;
+    });
+
+    this.eventsService.emptyDaysSubject$.subscribe((days) => {
+      this.emptyDays = days;
+    });
+
     this.eventsService.initEvents();
-    this.generateCalendar();
   }
 
-  generateCalendar() {
-    const startOfMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth(), 1);
-    const endOfMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 0);
+  updateParam() {
+    const formattedDate = `${this.currentMonth.getFullYear()}-${String(this.currentMonth.getMonth() + 1).padStart(2, '0')}`;
 
-    this.emptyDays = new Array(startOfMonth.getDay()).fill(null);
-    this.daysInMonth = [];
-
-    for (let day = new Date(startOfMonth); day <= endOfMonth; day.setDate(day.getDate() + 1)) {
-      this.daysInMonth.push(new Date(day));
-    }
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { m: formattedDate },
+      queryParamsHandling: 'merge',
+    });
   }
 
   goToNextMonth() {
-    this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 1);
-    this.generateCalendar();
+    this.eventsService.setCurrentMonth(
+      new Date(
+        this.currentMonth.getFullYear(),
+        this.currentMonth.getMonth() + 1,
+        1,
+      ),
+    );
+
+    this.updateParam();
   }
 
   goToPreviousMonth() {
-    this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() - 1, 1);
-    this.generateCalendar();
+    this.eventsService.setCurrentMonth(
+      new Date(
+        this.currentMonth.getFullYear(),
+        this.currentMonth.getMonth() - 1,
+        1,
+      ),
+    );
+
+    this.updateParam();
   }
 
   openDatePicker() {
@@ -71,9 +111,11 @@ export class CalendarComponent implements OnInit {
   }
 
   onMonthSelected(event: Date) {
-    this.currentMonth = new Date(event.getFullYear(), event.getMonth(), 1);
-    this.generateCalendar();
+    this.eventsService.setCurrentMonth(
+      new Date(event.getFullYear(), event.getMonth(), 1),
+    );
 
-    this.picker.close(); 
+    this.picker.close();
+    this.updateParam();
   }
 }

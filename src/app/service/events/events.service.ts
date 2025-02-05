@@ -6,23 +6,40 @@ import { CalendarValue } from '../../../types/calendar';
   providedIn: 'root',
 })
 export class EventsService {
-  private events = new BehaviorSubject<CalendarValue[]>([]);
+  private eventsSubject = new BehaviorSubject<CalendarValue[]>([]);
+  private currentMonthSubject = new BehaviorSubject<Date>(new Date());
+  private daysInMonthSubject = new BehaviorSubject<Date[]>([]);
+  private emptyDaysSubject = new BehaviorSubject<null[]>([]);
 
-  events$ = this.events.asObservable();
+  get eventsSubject$() {
+    return this.eventsSubject.asObservable();
+  }
+
+  get currentMonth$() {
+    return this.currentMonthSubject.asObservable();
+  }
+
+  get daysInMonth$() {
+    return this.daysInMonthSubject.asObservable();
+  }
+
+  get emptyDaysSubject$() {
+    return this.emptyDaysSubject.asObservable();
+  }
 
   initEvents() {
     try {
       const jsonData = localStorage.getItem('appointments') || '';
       const events = JSON.parse(jsonData);
 
-      this.events.next(events);
+      this.eventsSubject.next(events);
     } catch (error) {
-      this.events.next([]);
+      this.eventsSubject.next([]);
     }
   }
 
   getEvents(): CalendarValue[] {
-    return this.events.value;
+    return this.eventsSubject.value;
   }
 
   getEventsByDate(date: Date): CalendarValue[] {
@@ -33,7 +50,7 @@ export class EventsService {
     const startTime = new Date(utcYear, utcMonth, utcDate, 0, 0, 0, 0);
     const endTime = new Date(utcYear, utcMonth, utcDate, 23, 59, 59, 999);
 
-    return this.events.value
+    return this.eventsSubject.value
       .filter(
         (event) =>
           new Date(event.startTime).getTime() >= startTime.getTime() &&
@@ -46,26 +63,55 @@ export class EventsService {
   }
 
   addEvent(event: CalendarValue): void {
-    this.events.next([...this.events.value, event]);
+    this.eventsSubject.next([...this.eventsSubject.value, event]);
 
-    localStorage.setItem('appointments', JSON.stringify(this.events.value));
+    this.saveEventToLocalStorage();
   }
 
   updateEvent(updatedEvent: CalendarValue): void {
-    this.events.next(
-      this.events.value.map((event) =>
+    this.eventsSubject.next(
+      this.eventsSubject.value.map((event) =>
         event.id === updatedEvent.id ? updatedEvent : event,
       ),
     );
 
-    localStorage.setItem('appointments', JSON.stringify(this.events.value));
+    this.saveEventToLocalStorage();
   }
 
   deleteEvent(event: CalendarValue): void {
-    this.events.next(
-      this.events.value.filter((value) => event.id !== value.id),
+    this.eventsSubject.next(
+      this.eventsSubject.value.filter((value) => event.id !== value.id),
     );
 
-    localStorage.setItem('appointments', JSON.stringify(this.events.value));
+    this.saveEventToLocalStorage();
+  }
+
+  saveEventToLocalStorage() {
+    localStorage.setItem(
+      'appointments',
+      JSON.stringify(this.eventsSubject.value),
+    );
+  }
+
+  setCurrentMonth(date: Date) {
+    this.currentMonthSubject.next(date);
+    this.generateDaysInMonth(date);
+  }
+
+  private generateDaysInMonth(date: Date) {
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+    const daysInMonth: Date[] = [];
+    for (
+      let day = new Date(startOfMonth);
+      day <= endOfMonth;
+      day.setDate(day.getDate() + 1)
+    ) {
+      daysInMonth.push(new Date(day));
+    }
+
+    this.emptyDaysSubject.next(new Array(startOfMonth.getDay()).fill(null));
+    this.daysInMonthSubject.next(daysInMonth);
   }
 }

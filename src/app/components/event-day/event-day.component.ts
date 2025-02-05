@@ -32,7 +32,7 @@ export class EventDayComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.eventsService.events$.subscribe(() => {
+    this.eventsService.eventsSubject$.subscribe(() => {
       this.events = this.eventsService.getEventsByDate(this.day);
     });
   }

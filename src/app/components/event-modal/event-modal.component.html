@@ -31,6 +31,15 @@
   </mat-dialog-content>
 
   <mat-dialog-actions>
+    <button
+      *ngIf="data.event"
+      class="delete-button"
+      mat-flat-button
+      (click)="onDelete()"
+    >
+      Delete
+    </button>
+
     <button mat-button (click)="onCancel()">Cancel</button>
     <button
       mat-flat-button
@@ -39,14 +48,6 @@
       [disabled]="eventForm.invalid"
     >
       {{ data.event ? "Update" : "Save" }}
-    </button>
-    <button
-      *ngIf="data.event"
-      class="delete-button"
-      mat-flat-button
-      (click)="onDelete()"
-    >
-      Delete
     </button>
   </mat-dialog-actions>
 </form>

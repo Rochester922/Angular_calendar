@@ -62,19 +62,6 @@ export class EventModalComponent {
       const startTimeString = new Date(startTime).toTimeString().split(' ')[0];
       const endTimeString = new Date(endTime).toTimeString().split(' ')[0];
 
-      console.log({
-        startTimeString,
-        endTimeString,
-        date,
-        baseDateString,
-        aaa: {
-          id: this.data.event?.id || v4(),
-          title,
-          startTime: new Date(`${baseDateString}T${startTimeString}`),
-          endTime: new Date(`${baseDateString}T${endTimeString}`),
-        },
-      });
-
       this.dialogRef.close({
         id: this.data.event?.id || v4(),
         title,
