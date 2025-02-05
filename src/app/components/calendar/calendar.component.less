@@ -1,0 +1,52 @@
+.calendar-container {
+  text-align: center;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  button {
+    padding: 10px;
+  }
+
+  .calendar {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    .days-of-week,
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-gap: 10px;
+    }
+
+    .days {
+      flex: 1;
+      margin-bottom: 20px;
+    }
+
+    .day {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 30px;
+
+    .add-event-button {
+      width: 200px;
+    }
+  }
+}

@@ -1,0 +1,35 @@
+.event-day {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+
+  .appointments {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: transparent;
+
+    .appointment {
+      cursor: pointer;
+      background-color: #039be5;
+      border-radius: 5px;
+      color: #fff;
+      padding: 2px 5px;
+      text-align: left;
+      font-size: 12px;
+
+      span {
+        font-size: 14px;
+        font-weight: 500;
+      }
+    }
+  }
+}

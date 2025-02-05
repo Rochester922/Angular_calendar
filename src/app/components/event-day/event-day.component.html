@@ -1,0 +1,22 @@
+<div class="event-day" (click)="openEventDialog(day)">
+  <div class="day">
+    {{ day.getDate() }}
+  </div>
+  <div
+    class="appointments"
+    cdkDropList
+    [cdkDropListData]="events"
+    (cdkDropListDropped)="drop($event, day)"
+  >
+    <div
+      class="appointment"
+      *ngFor="let event of events"
+      (click)="editEventDialog(day, event, $event)"
+      cdkDrag
+      [cdkDragData]="event"
+    >
+      {{ formatStartTime(event) }}
+      <span> {{ event.title }}</span>
+    </div>
+  </div>
+</div>

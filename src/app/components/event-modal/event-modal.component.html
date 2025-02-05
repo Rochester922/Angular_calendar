@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>Add Event</h2>
+<form [formGroup]="eventForm" (ngSubmit)="onSave()" class="add-event-modal">
+  <mat-dialog-content>
+    <mat-form-field appearance="fill" class="title">
+      <mat-label>Event Title</mat-label>
+      <input matInput formControlName="title" required />
+    </mat-form-field>
+    <div class="time-range">
+      <mat-form-field appearance="fill">
+        <mat-label>Start Time</mat-label>
+        <input
+          matInput
+          [matTimepicker]="startTime"
+          formControlName="startTime"
+          required
+        />
+        <mat-timepicker #startTime></mat-timepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>End Time</mat-label>
+        <input
+          matInput
+          [matTimepicker]="endTime"
+          formControlName="endTime"
+          required
+        />
+        <mat-timepicker #endTime></mat-timepicker>
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="submit"
+      [disabled]="eventForm.invalid"
+    >
+      {{ data.event ? "Update" : "Save" }}
+    </button>
+    <button
+      *ngIf="data.event"
+      class="delete-button"
+      mat-flat-button
+      (click)="onDelete()"
+    >
+      Delete
+    </button>
+  </mat-dialog-actions>
+</form>

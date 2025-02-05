@@ -1,0 +1,32 @@
+<div class="calendar-container">
+  <header>
+    <button mat-flat-button (click)="goToPreviousMonth()">Prev</button>
+    <h2>
+      {{
+        currentMonth.toLocaleString("default", {
+          month: "long",
+          year: "numeric",
+        })
+      }}
+    </h2>
+    <button mat-flat-button (click)="goToNextMonth()">Next</button>
+  </header>
+
+  <div class="calendar" cdkDropListGroup>
+    <div class="days-of-week">
+      <div
+        *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
+      >
+        {{ day }}
+      </div>
+    </div>
+    <div class="days">
+      <div *ngFor="let day of emptyDays" class="day"></div>
+      <app-event-day
+        class="day"
+        *ngFor="let day of daysInMonth"
+        [day]="day"
+      ></app-event-day>
+    </div>
+  </div>
+</div>
